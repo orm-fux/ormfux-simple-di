@@ -1,7 +1,17 @@
 # About
 
-This is a small library providing some dependency injection capabilities . Use this when you have a small 
+This is a small library providing some dependency injection capabilities. Use this when you have a small 
 application, want DI comfort, but don't want the large pool of features like they are provided by Spring.
+
+Available on [MavenCentral](https://search.maven.org/search?q=g:com.github.orm-fux%20AND%20a:ormfux-simple-di):
+
+```xml
+<dependency>
+  <groupId>com.github.orm-fux</groupId>
+  <artifactId>ormfux-simple-di</artifactId>
+  <version>1.5</version>
+</dependency>
+```
 
 # Usage
 
