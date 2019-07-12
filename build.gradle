@@ -1,0 +1,112 @@
+apply plugin: 'eclipse'
+apply plugin: 'java-library'
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+/* Java version */
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+/* Identifier */
+group = 'com.github.orm-fux'
+archivesBaseName = 'ormfux-simple-di'
+version = '1.5'
+
+/* dependencies */
+dependencies {
+    testImplementation 'junit:junit:4.11'
+    testImplementation 'org.assertj:assertj-core:3.12.0'
+}
+
+/* unit test resources folder */
+task copyTestResources(type: Copy) {
+    from "${projectDir}/src/test/resources"
+    into "${buildDir}/classes/java/test"
+}
+
+processTestResources.dependsOn copyTestResources
+
+/* test logging */
+test {
+    testLogging {
+        exceptionFormat = 'full'
+    }
+}
+
+        
+/* repos */
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+/* Maven artifact creation */
+signing {
+    sign configurations.archives
+}
+
+task javadocJar(type: Jar) {
+    from javadoc
+    classifier = 'javadoc'
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    classifier = 'sources'
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+            
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+            
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+            
+            pom.project {
+                name project.name
+                description 'A small library for simple application that want to use dependency injection'
+                packaging 'jar'
+                url 'https://github.com/orm-fux/ormfux-simple-di'
+                
+                scm {
+                    connection 'scm:git:https://github.com/orm-fux/ormfux-simple-di.git'
+                    developerConnection 'scm:git:git@github.com:orm-fux/ormfux-simple-di.git'
+                    url 'https://github.com/orm-fux/ormfux-simple-di.git'
+                }
+                
+                licenses {
+                    license {
+                        name 'The Unlicense'
+                        url 'http://unlicense.org/'
+                        distribution 'repo'
+                    }
+                }
+                
+                developers {
+                    developer {
+                        id 'orm-fux'
+                        name 'FM'
+                    }
+                }
+            }
+        }
+    }
+}
+
+if (JavaVersion.current().isJava8Compatible()) {
+    allprojects {
+        tasks.withType(Javadoc) {
+            options.addStringOption('Xdoclint:none', '-quiet')
+        }
+    }
+}
